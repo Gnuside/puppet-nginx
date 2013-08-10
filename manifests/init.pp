@@ -81,6 +81,45 @@ define nginx::vhost (
         }
 }
 
+define nginx::vhost_php (
+  $domain = "",
+  $documentroot = "",
+  $domainalias = "",
+  $includes = []
+) {
+  include nginx
+  include nginx::php_fpm
+
+  $fastcgi_sock = $nginx::php_fpm::sock_file
+
+
+
+  if $domain == "" {
+    $vhost_domain = $name
+  } else {
+    $vhost_domain = $domain
+  }
+
+  if $domainalias == "" {
+    $vhost_alias = "www.${vhost_domain}"
+  } else {
+    $vhost_alias = $domainalias
+  }
+
+  if $documentroot == "" {
+    $vhost_root = "${nginx_root}/${name}"
+  } else {
+    $vhost_root = $documentroot
+  }
+
+  file { "${nginx::nginx_sites}-available/${vhost_domain}":
+    ensure => 'present',
+    content => template("nginx/vhost-php.erb"),
+    require => Package['nginx', 'php5-fpm'],
+    ## notify => Exec["enable-${vhost_domain}-vhost"],
+  }
+}
+
 
 # Define an nginx site. Place all site configs into
 # /etc/nginx/sites-available and en-/disable them with this type.

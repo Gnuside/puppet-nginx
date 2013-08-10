@@ -1,0 +1,29 @@
+
+server {
+  listen  80;
+  server_name <%= @vhost_domain %> <% if @vhost_alias %> <%= @vhost_alias %> <% end %>;
+
+  access_log  /var/log/nginx/<%= @vhost_domain %>-access.log;
+
+  root  <%= @vhost_root %>;
+  index index.php index.html index.htm;
+  autoindex on;
+
+  <% while ! @includes.empty? do %>
+  include   <% @includes.pop() %> ;
+  <% end %>
+  # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+  #
+  location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+
+    # With php5-cgi alone:
+    #fastcgi_pass 127.0.0.1:9000;
+    # With php5-fpm:
+		fastcgi_pass unix:<%= @fastcgi_sock %>;
+    fastcgi_index index.php;
+    include fastcgi_params;
+  }
+}
