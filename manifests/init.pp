@@ -118,6 +118,13 @@ define nginx::vhost_php (
     require => Package['nginx', 'php5-fpm'],
     ## notify => Exec["enable-${vhost_domain}-vhost"],
   }
+
+  file { "${vhost_root}/phpmyadmin":
+    target  => "/usr/share/phpmyadmin",
+    ensure  => link,
+    require => Package['nginx', 'phpmyadmin'],
+    notify  => Class["nginx::service"]
+  }
 }
 
 

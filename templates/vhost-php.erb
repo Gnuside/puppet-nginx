@@ -22,7 +22,7 @@ server {
     # With php5-cgi alone:
     #fastcgi_pass 127.0.0.1:9000;
     # With php5-fpm:
-		fastcgi_pass unix:<%= @fastcgi_sock %>;
+    fastcgi_pass unix:<%= @fastcgi_sock %>;
     fastcgi_index index.php;
     include fastcgi_params;
   }
